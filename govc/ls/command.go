@@ -24,7 +24,6 @@ import (
 	"github.com/vmware/govmomi/govc/cli"
 	"github.com/vmware/govmomi/govc/flags"
 	"github.com/vmware/govmomi/list"
-	"github.com/vmware/govmomi/vim25/mo"
 	"golang.org/x/net/context"
 )
 
@@ -83,43 +82,11 @@ type listResult struct {
 }
 
 func (l listResult) Write(w io.Writer) error {
-	var err error
-
 	for _, e := range l.Elements {
 		if !l.Long {
 			fmt.Fprintf(w, "%s\n", e.Path)
-			continue
-		}
-
-		switch e.Object.(type) {
-		case mo.Folder:
-			if _, err = fmt.Fprintf(w, "%s/\n", e.Path); err != nil {
-				return err
-			}
-		case mo.Datacenter:
-			if _, err = fmt.Fprintf(w, "%s (Datacenter)\n", e.Path); err != nil {
-				return err
-			}
-		case mo.VirtualMachine:
-			if _, err = fmt.Fprintf(w, "%s (VirtualMachine)\n", e.Path); err != nil {
-				return err
-			}
-		case mo.Network:
-			if _, err = fmt.Fprintf(w, "%s (Network)\n", e.Path); err != nil {
-				return err
-			}
-		case mo.ComputeResource:
-			if _, err = fmt.Fprintf(w, "%s (ComputeResource)\n", e.Path); err != nil {
-				return err
-			}
-		case mo.Datastore:
-			if _, err = fmt.Fprintf(w, "%s (Datastore)\n", e.Path); err != nil {
-				return err
-			}
-		case mo.ResourcePool:
-			if _, err = fmt.Fprintf(w, "%s (ResourcePool)\n", e.Path); err != nil {
-				return err
-			}
+		} else {
+			fmt.Fprintf(w, "%s (%s)\n", e.Path, e.Object.Reference().Type);
 		}
 	}
 
